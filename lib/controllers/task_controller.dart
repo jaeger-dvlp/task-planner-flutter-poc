@@ -24,6 +24,19 @@ class TaskController extends GetxController {
     update();
   }
 
+  void updateTask(String id, String newTitle, String newDesc) {
+    final index = taskList.indexWhere((task) => task.id == id);
+    if (index! != -1) {
+      final updatedTask = taskList[index].copyWith(
+        title: newTitle,
+        description: newDesc,
+      );
+
+      taskList[index] = updatedTask;
+      update();
+    }
+  }
+
   void toggleDone(String id) {
     final index = taskList.indexWhere((task) => task.id == id);
 
