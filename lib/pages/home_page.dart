@@ -136,7 +136,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctx) {
-    final taskController = Get.put(TaskController());
+    final taskController = Get.find<TaskController>();
     return Scaffold(
       appBar: AppBar(title: const Text("Task Planner"), centerTitle: true),
       body: Padding(

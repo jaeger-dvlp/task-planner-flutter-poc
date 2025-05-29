@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:task_planner_poc/bindings/task_binding.dart';
 
 // Page imports;
 import 'package:task_planner_poc/pages/home_page.dart';
@@ -16,6 +17,7 @@ class MainApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
+      initialBinding: TaskBinding(),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
