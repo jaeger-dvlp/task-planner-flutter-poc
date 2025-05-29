@@ -1,11 +1,24 @@
 import 'package:get/get.dart';
+import 'package:task_planner_poc/services/local_db_service.dart';
 import 'package:uuid/uuid.dart';
-
 import 'package:task_planner_poc/models/task_model.dart';
 
 class TaskController extends GetxController {
   final RxList<Task> taskList = <Task>[].obs;
   final Uuid uuid = Uuid();
+  final LocalDbService _dbService = Get.find<LocalDbService>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadTasksFromDb();
+  }
+
+  void _loadTasksFromDb() {
+    final storedTasks = _dbService.loadTasks();
+    taskList.assignAll(storedTasks);
+    update();
+  }
 
   void addTask(String title, String description) {
     final newTask = Task(
@@ -16,11 +29,13 @@ class TaskController extends GetxController {
     );
 
     taskList.add(newTask);
+    _dbService.saveTasks(taskList);
     update();
   }
 
   void removeTask(String id) {
     taskList.removeWhere((task) => task.id == id);
+    _dbService.saveTasks(taskList);
     update();
   }
 
@@ -33,6 +48,7 @@ class TaskController extends GetxController {
       );
 
       taskList[index] = updatedTask;
+      _dbService.saveTasks(taskList);
       update();
     }
   }
@@ -45,6 +61,7 @@ class TaskController extends GetxController {
         isDone: !taskList[index].isDone,
       );
       taskList[index] = updatedTask;
+      _dbService.saveTasks(taskList);
       update();
     }
   }
