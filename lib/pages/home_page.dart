@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:task_planner_poc/controllers/task_controller.dart';
+import 'package:task_planner_poc/models/task_model.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -34,6 +37,52 @@ class HomePage extends StatelessWidget {
               Navigator.of(ctx).pop();
             },
             child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditTaskDialog(BuildContext ctx, Task task) {
+    final titleController = TextEditingController(text: task.title);
+    final descController = TextEditingController(text: task.description);
+
+    showDialog(
+      context: ctx,
+      builder: (_) => AlertDialog(
+        title: const Text('Edit Task'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(labelText: "Task Title"),
+            ),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Task Description'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newTitle = titleController.text.trim();
+              final newDesc = descController.text.trim();
+
+              if (newTitle.isNotEmpty && newDesc.isNotEmpty) {
+                final controller = Get.find<TaskController>();
+                controller.updateTask(task.id, newTitle, newDesc);
+                Navigator.of(ctx).pop();
+              }
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
@@ -104,6 +153,9 @@ class HomePage extends StatelessWidget {
                 final task = taskController.taskList[index];
                 return Card(
                   child: ListTile(
+                    onLongPress: () {
+                      _showEditTaskDialog(ctx, task);
+                    },
                     leading: IconButton(
                       onPressed: () {
                         taskController.toggleDone(task.id);
@@ -122,12 +174,32 @@ class HomePage extends StatelessWidget {
                             : null,
                       ),
                     ),
-                    subtitle: Text(task.description),
-                    trailing: IconButton(
-                      onPressed: () {
-                        _removeTaskDialog(ctx, task.id, task.title);
-                      },
-                      icon: const Icon(Icons.delete),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(task.description),
+                        Text(
+                          'Created At :${DateFormat('dd.MM.yyyy - HH:mm').format(task.createdAt)} ',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    trailing: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            _removeTaskDialog(ctx, task.id, task.title);
+                          },
+                          icon: const Icon(Icons.delete),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _showEditTaskDialog(ctx, task);
+                          },
+                          icon: const Icon(Icons.edit),
+                        ),
+                      ],
                     ),
                   ),
                 );
